@@ -38,7 +38,7 @@ contract Solarcell is IResourceGenerator, ERC721, Ownable {
   function _getAvailableResources(uint256 _tokenId) private view returns (uint256) {
     ownerOf(_tokenId);
     uint256 hoursDifference = (block.timestamp - tokenIdToLastRetrieveTimestamp[_tokenId]) / 3600;
-    return hoursDifference * tokenIdToTier[_tokenId];
+    return hoursDifference * tokenIdToTier[_tokenId]; // on tier 1: 1 token / hour
   }
 
   function getAvailableResources(uint256 _tokenId) public view returns (uint256) {

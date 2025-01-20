@@ -6,14 +6,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 /* 
  * Energy formula:
- * 0 - 200 kcal -> kcal * 0.01 (max 2 ET)
- * 201 - 2000 kcal -> (kcal-200) * 0.005 (max 9 ET, total 11 ET)
+ * 0 - 200 kcal -> kcal * 0.1 (max 20 ET)
+ * 201 - 2000 kcal -> (kcal-200) * 0.05 (max 99 ET, total 110 ET)
  */
 
 contract ProofOfExercise is Ownable {
   event Proof(address indexed user, uint256 indexed caloriesBurnt, uint256 indexed energyGranted);
-
-  uint256 constant DECIMALS = 10**18;
 
   IEnergyToken private resource;
 
@@ -27,14 +25,15 @@ contract ProofOfExercise is Ownable {
     uint256 energy = 0;
 
     if (_calories <= 200) {
-      energy = (_calories * DECIMALS) / 100;
+      energy = _calories / 10;
     } else {
       if (_calories <= 2000) {
-        energy = (200 * DECIMALS) / 100 + ((_calories - 200) * DECIMALS) / 200;
+        energy = 20 + (_calories - 200) / 20;
       } else {
-        energy = (200 * DECIMALS) / 100 + ((2000 - 200) * DECIMALS) / 200;
+        energy = 20 + (2000 - 200) / 20;
       }
     }
+    require(energy > 0, "Not enough calories");
     resource.mint(energy);
     resource.transfer(_receiver, energy);
     emit Proof(_receiver, _calories, energy);

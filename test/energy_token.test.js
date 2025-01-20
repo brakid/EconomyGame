@@ -1,5 +1,4 @@
 const EnergyToken = artifacts.require("EnergyToken");
-const Solarcell = artifacts.require("Solarcell");
 const { BN, expectRevert, expectEvent } = require('@openzeppelin/test-helpers');
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -8,7 +7,7 @@ contract("EnergyToken", function (accounts) {
     const token = await EnergyToken.deployed();
     assert.equal(await token.name(), "EnergyToken");
     assert.equal(await token.symbol(), "ET");
-    assert.equal(await token.decimals(), 18);
+    assert.equal(await token.decimals(), 0);
     assert.equal(await token.totalSupply(), 0);
 
     const tokenOwner = accounts[0];

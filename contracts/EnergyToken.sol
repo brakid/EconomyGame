@@ -17,10 +17,12 @@ interface IEnergyToken is IERC20 {
 contract EnergyToken is ERC20, IEnergyToken, Ownable {
   mapping(address => bool) private allowedToMint;
 
-  constructor() Ownable(msg.sender) ERC20("EnergyToken", "ET") {}
+  constructor() Ownable(msg.sender) ERC20("EnergyToken", "ET") {
+    allowedToMint[msg.sender] = true;
+  }
 
   function decimals() override public pure returns (uint8) {
-    return 18;
+    return 0;
   }
 
   function addMinter(address _minter) external onlyOwner() {

@@ -10,4 +10,5 @@
 ```
 let solarcell = await Solarcell.at('0xd7a68CDe57Da025109ee8a3120F1ec560c7829e4');
 let proofOfExercise = await ProofOfExercise.deployed();
+let energyToken = await EnergyToken.at('0xCf6838a1013829c5B922Be6dF2557081c0025752');
 ```
