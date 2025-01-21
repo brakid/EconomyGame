@@ -8,7 +8,8 @@
 
 ## Usage via truffle console
 ```
-let solarcell = await Solarcell.at('0xd7a68CDe57Da025109ee8a3120F1ec560c7829e4');
-let proofOfExercise = await ProofOfExercise.deployed();
-let energyToken = await EnergyToken.at('0xCf6838a1013829c5B922Be6dF2557081c0025752');
+let solarcell = await Solarcell.at('0x63f3468e34656c9321cb264021fc154f934400c2');
+let energyToken = await EnergyToken.at('0x0cc664eA36dc5604b45bd8fFC0c2eaded868DEe0');
+let proof = await ProofOfExercise.at('0x7068fa718bdfa9bca6732fc2ef610c7178ef3ef6');
+let exchange = await ExchangePool.at('0x849b71e19ad5c15af17c63ea19e8059fb7912d92');
 ```

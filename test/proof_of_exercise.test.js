@@ -18,19 +18,19 @@ contract("ProofOfExercise", function (accounts) {
     const user4 = accounts[5];
 
     await expectRevert.unspecified(proofOfExercise.grantEnergy(user1, 1, { from: user1}));
-    await expectRevert(proofOfExercise.grantEnergy(ZERO_ADDRESS, 1, { from: tokenOwner}), "Zero address not allowed as receiver");
+    await expectRevert(proofOfExercise.grantEnergy(ZERO_ADDRESS, 1, { from: tokenOwner}), "Zero address not allowed");
     await expectRevert(proofOfExercise.grantEnergy(user1, 0, { from: tokenOwner}), "Not enough calories");
-    expectEvent(await proofOfExercise.grantEnergy(user1, 15, { from: tokenOwner}), "Proof", { "user": user1, "caloriesBurnt": new BN(15), "energyGranted": new BN(1) });
-    expectEvent(await proofOfExercise.grantEnergy(user2, 200, { from: tokenOwner}), "Proof", { "user": user2, "caloriesBurnt": new BN(200), "energyGranted": new BN(20) });
-    expectEvent(await proofOfExercise.grantEnergy(user3, 2000, { from: tokenOwner}), "Proof", { "user": user3, "caloriesBurnt": new BN(2000), "energyGranted": new BN(110) });
-    expectEvent(await proofOfExercise.grantEnergy(user4, 4000, { from: tokenOwner}), "Proof", { "user": user4, "caloriesBurnt": new BN(4000), "energyGranted": new BN(110) });
+    expectEvent(await proofOfExercise.grantEnergy(user1, 15, { from: tokenOwner}), "Proof", { "user": user1, "caloriesBurnt": new BN(15), "energyGranted": new BN(150) });
+    expectEvent(await proofOfExercise.grantEnergy(user2, 200, { from: tokenOwner}), "Proof", { "user": user2, "caloriesBurnt": new BN(200), "energyGranted": new BN(2000) });
+    expectEvent(await proofOfExercise.grantEnergy(user3, 2000, { from: tokenOwner}), "Proof", { "user": user3, "caloriesBurnt": new BN(2000), "energyGranted": new BN(11000) });
+    expectEvent(await proofOfExercise.grantEnergy(user4, 4000, { from: tokenOwner}), "Proof", { "user": user4, "caloriesBurnt": new BN(4000), "energyGranted": new BN(11000) });
     let balance = await token.balanceOf(user1);
-    assert(balance.eq(new BN(1)));
+    assert(balance.eq(new BN(150)));
     balance = await token.balanceOf(user2);
-    assert(balance.eq(new BN(20)));
+    assert(balance.eq(new BN(2000)));
     balance = await token.balanceOf(user3);
-    assert(balance.eq(new BN(110)));
+    assert(balance.eq(new BN(11000)));
     balance = await token.balanceOf(user4);
-    assert(balance.eq(new BN(110)));
+    assert(balance.eq(new BN(11000)));
   });
 });
