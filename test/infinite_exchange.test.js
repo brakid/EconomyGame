@@ -58,74 +58,12 @@ contract("InfiniteExchange", function (accounts) {
         let accruedFees = await infiniteExchange.accruedFees();
         assert(accruedFees.eq(toWei("2", "gwei")));
         balance = await web3.eth.getBalance(infiniteExchange.address);
-        assert(new BN(balance).eq(toWei("1", "ether").sub(toWei("0.1", "ether").sub(toWei("1", "gwei")))));
+        const expectedBalance = toWei("1", "ether").sub(toWei("0.1", "ether").sub(toWei("1", "gwei"))); // 1 ether paid in (including 1 gwei in fees), 0.1 ether - 1 gwei (fees) paid out 
+        assert(new BN(balance).eq(expectedBalance));
         await infiniteExchange.withdraw();
         balance = await web3.eth.getBalance(infiniteExchange.address);
-        assert(new BN(balance).eq(toWei("1", "ether").sub(toWei("0.1", "ether").add(toWei("1", "gwei")).sub(toWei("2", "gwei")))));
+        assert(new BN(balance).eq(expectedBalance.sub(toWei("2", "gwei"))));
         accruedFees = await infiniteExchange.accruedFees();
         assert(accruedFees.eq(new BN(0)));
-        /*
-            await energyToken.transfer(exchangePool.address, 1000, { from: tokenOwner });
-            balance = await energyToken.balanceOf(tokenOwner);
-            assert(balance.eq(new BN(0)));
-            balance = await energyToken.balanceOf(exchangePool.address);
-            assert(balance.eq(new BN(1000)));
-            await web3.eth.getBalance(tokenOwner);
-            await web3.eth.sendTransaction({ from: tokenOwner, to: exchangePool.address, value: ether("10") });
-            balance = await web3.eth.getBalance(exchangePool.address);
-            assert(new BN(balance).eq(ether("10")));
-            balance = await energyToken.balanceOf(exchangePool.address);
-            assert(balance.eq(new BN(1000)));
-        
-            await energyToken.mint(1000, { from: tokenOwner });
-            await energyToken.transfer(seller, 1000, { from: tokenOwner });
-            balance = await energyToken.balanceOf(seller);
-            assert(balance.eq(new BN(1000)));
-        
-            let pricePerSol = await exchangePool.pricePerSol();
-            assert(pricePerSol.eq(new BN(100)));
-            await expectRevert.unspecified(exchangePool.sell(100, { from: seller }));
-            await energyToken.approve(exchangePool.address, 1000, { from: seller });
-            expectEvent(await exchangePool.sell(100, { from: seller }), "Trade", { "sender": seller, "resource": energyToken.address, "sale": true, "amountSol": ether("1").sub(toWeiBN("1", "gwei")), "amountResource": new BN(100) });
-            balance = await energyToken.balanceOf(seller);
-            assert(balance.eq(new BN(900)));
-            balance = await energyToken.balanceOf(exchangePool.address);
-            assert(balance.eq(new BN(1100)));
-            pricePerSol = await exchangePool.pricePerSol();
-            assert(pricePerSol.eq(new BN(190)));
-            let collectableFees = await exchangePool.collectableFees();
-            assert(collectableFees.eq(toWei("1", "gwei")));
-            balance = await web3.eth.getBalance(exchangePool.address);
-            assert(new BN(balance).eq(ether("9").add(toWei("1", "gwei"))));
-        
-            try {
-              await web3.eth.sendTransaction({ from: buyer, to: exchangePool.address, value: new BN(1) });
-              assert(false);
-            } catch (error) {}
-        
-            await web3.eth.sendTransaction({ from: buyer, to: exchangePool.address, value: ether("1").add(toWei("1", "gwei")) });
-        
-            balance = await energyToken.balanceOf(buyer);
-            assert(balance.eq(new BN(190)));
-            balance = await energyToken.balanceOf(exchangePool.address);
-            assert(balance.eq(new BN(910)));
-            pricePerSol = await exchangePool.pricePerSol();
-            assert(pricePerSol.eq(new BN(10)));
-            collectableFees = await exchangePool.collectableFees();
-            assert(collectableFees.eq(toWei("2", "gwei")));
-        
-            balance = await web3.eth.getBalance(exchangePool.address);
-            assert(new BN(balance).eq(ether("10").add(toWeiBN("2", "gwei"))));
-        
-            balance = await exchangePool.collectableFees();
-            assert(new BN(balance).eq(toWei("2", "gwei")));
-            await exchangePool.withdraw({ from: tokenOwner });
-            balance = await exchangePool.collectableFees();
-            assert(new BN(balance).eq(new BN(0)));
-            balance = await web3.eth.getBalance(exchangePool.address);
-            assert(new BN(balance).eq(ether("10")));
-        
-            balance = await energyToken.totalSupply();
-            assert(balance.eq(new BN(2000)));*/
     });
 });

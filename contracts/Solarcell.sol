@@ -3,16 +3,18 @@
 pragma solidity >=0.8.2 <0.9.0;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {IToken, IHarvester, Mintable} from "./Interfaces.sol";
+import {IToken, IHarvester, Mintable, ERC721Ownable} from "./Interfaces.sol";
 
-contract Solarcell is ERC721, IHarvester, Mintable {
+contract Solarcell is ERC721, ERC721Ownable, IHarvester, Mintable {
     IToken private immutable resource;
-    uint256 public nextTokenId = 0;
+    uint256 private immutable factor;
+    uint256 public nextTokenId;
     mapping(uint256 => uint256) private lastTimestamp;
 
-    constructor(address _resource) ERC721("Solarcell", "SC") Mintable() {
+    constructor(address _resource) ERC721("Solarcell", "SLC") Mintable() {
         require(_resource != address(0), "Zero address not allowed");
         resource = IToken(_resource);
+        factor = 10**resource.decimals();
         addMinter(msg.sender);
     }
 
@@ -20,30 +22,26 @@ contract Solarcell is ERC721, IHarvester, Mintable {
         return address(resource);
     }
 
-    function mint() external onlyMinters() {
+    function mint() external onlyMinters() returns (uint256) {
         _mint(msg.sender, nextTokenId);
         lastTimestamp[nextTokenId] = block.timestamp;
-        nextTokenId += 1;
+        return nextTokenId++;
     }
 
-    function burn(uint256 _tokenId) external {
-        require(ownerOf(_tokenId) == msg.sender, "Only owner");
+    function burn(uint256 _tokenId) external onlyTokenOwner(_tokenId) {
         _burn(_tokenId);
     }
 
-    function _getAvailableResources(uint256 _tokenId) private view returns (uint256) {
-        return (block.timestamp - lastTimestamp[_tokenId]) * (10**resource.decimals()) / 3600; // one token per hour
-    }
-
     function getAvailableResources(uint256 _tokenId) external view returns (uint256) {
-        return _getAvailableResources(_tokenId);
+        ownerOf(_tokenId); // check tokenId exists
+        return (block.timestamp - lastTimestamp[_tokenId]) * factor / 3600; // one token per hour
     }
 
-    function withdraw(uint256 _tokenId) external {
-        require(ownerOf(_tokenId) == msg.sender, "Only owner");
-        uint256 available = _getAvailableResources(_tokenId);
+    function withdraw(uint256 _tokenId) external onlyTokenOwner(_tokenId) returns (uint256) {
+        uint256 available = (block.timestamp - lastTimestamp[_tokenId]) * factor / 3600; // one token per hour
         resource.mint(available);
         lastTimestamp[_tokenId] = block.timestamp;
         require(resource.transfer(msg.sender, available), "Transfer failed");
+        return available;
     }
 }

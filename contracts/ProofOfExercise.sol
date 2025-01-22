@@ -22,14 +22,13 @@ contract ProofOfExercise is Ownable {
 
     function grantEnergy(address _receiver, uint256 _calories) public onlyOwner {
         require(_receiver != address(0), "Zero address not allowed");
-        uint256 energy = 0;
+        uint256 energy;
 
         if (_calories <= 200) {
             energy = (_calories * 10 ** resource.decimals()) / 10;
         } else {
             if (_calories <= 2000) {
-                energy =
-                    (20 * (10 ** resource.decimals())) + ((_calories - 200) * (10 ** resource.decimals())) / 20;
+                energy = (20 * (10 ** resource.decimals())) + ((_calories - 200) * (10 ** resource.decimals())) / 20;
             } else {
                 energy = 110 * (10 ** resource.decimals());
             }

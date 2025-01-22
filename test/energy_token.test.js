@@ -1,5 +1,5 @@
 const EnergyToken = artifacts.require("EnergyToken");
-const { BN, expectRevert, expectEvent } = require('@openzeppelin/test-helpers');
+const { BN, expectRevert } = require('@openzeppelin/test-helpers');
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 contract("EnergyToken", function (accounts) {

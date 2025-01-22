@@ -8,6 +8,8 @@ contract("ProofOfExercise", function (accounts) {
     const token = await EnergyToken.deployed();
     const proofOfExercise = await ProofOfExercise.deployed();
 
+    await token.addMinter(proofOfExercise.address);
+
     const resource = await proofOfExercise.getResource();
     assert.equal(token.address, resource);
 

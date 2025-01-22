@@ -9,6 +9,8 @@ contract("Solararray", function (accounts) {
     const solarcell = await Solarcell.deployed();
     const solararray = await Solararray.deployed();
 
+    await energyToken.addMinter(solarcell.address);
+
     const resource = await solarcell.getResource();
     assert.equal(energyToken.address, resource);
 
@@ -25,7 +27,7 @@ contract("Solararray", function (accounts) {
     instanceOwner = await solararray.ownerOf(0);
     assert.equal(instanceOwner, solarOwner);
 
-    await expectRevert(solararray.addHarvester(0, 0), "Only owner");
+    await expectRevert(solararray.addHarvester(0, 0), "Token owner only");
     await expectRevert.unspecified(solararray.addHarvester(0, 0, { from: solarOwner }));
     await expectRevert.unspecified(solararray.addHarvester(0, 1, { from: solarOwner }));
 
@@ -45,7 +47,7 @@ contract("Solararray", function (accounts) {
     assert(availableResources.eq(new BN(100)));
 
     await expectRevert.unspecified(solararray.withdraw(1, { from: solarOwner}));
-    await expectRevert(solararray.withdraw(0, { from: tokenOwner}), "Only owner");
+    await expectRevert(solararray.withdraw(0, { from: tokenOwner}), "Token owner only");
     let supply = await energyToken.totalSupply();
     assert(supply.eq(new BN(0)));
     let balance = await energyToken.balanceOf(solarOwner);

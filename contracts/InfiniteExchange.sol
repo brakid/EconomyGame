@@ -9,18 +9,19 @@ contract InfiniteExchange is Ownable {
     event Trade(address indexed sender, address resource, bool selling, uint256 amountSol, uint256 amountResource);
 
     IToken private immutable resource;
+    uint256 private immutable factor;
     uint256 public fee;
-    uint256 public accruedFees = 0;
-
+    uint256 public accruedFees;
     uint256 public constant MAX_FEE = 1 gwei;
     uint256 public constant MIN_PRICE_PER_SOL = 10;
     uint256 public constant MAX_PRICE_PER_SOL = 190;
     uint256 public pricePerSol;
 
-    constructor(address _resource, uint256 _fee) Ownable(msg.sender) {
+    constructor(address _resource) Ownable(msg.sender) {
         require(_resource != address(0), "Zero address not allowed");
         resource = IToken(_resource);
-        setFee(_fee);
+        factor = 10**resource.decimals();
+        setFee(MAX_FEE);
         pricePerSol = 100;
     }
 
@@ -37,14 +38,14 @@ contract InfiniteExchange is Ownable {
         require(msg.value > fee, "Amount does not cover fees");
         uint256 amountLessFees = msg.value - fee;
         accruedFees += fee;
-        uint256 fullSol = (amountLessFees * (10**resource.decimals())) / 1 ether;
+        uint256 fullSol = (amountLessFees * factor) / 1 ether;
         uint256 amountResource = fullSol * pricePerSol;
         require(amountResource > 0, "Not enough funds");
         
-        if (pricePerSol < (amountResource / (10**resource.decimals()))) {
+        if (pricePerSol < (amountResource / factor)) {
             pricePerSol = MIN_PRICE_PER_SOL;
         } else {
-            pricePerSol -= (amountResource / (10**resource.decimals()));
+            pricePerSol -= (amountResource / factor);
             if (pricePerSol < MIN_PRICE_PER_SOL) {
                 pricePerSol = MIN_PRICE_PER_SOL;
             }
@@ -57,13 +58,13 @@ contract InfiniteExchange is Ownable {
 
     function sell(uint256 _amountResource) external {
         require(_amountResource > 0, "Not enough funds");
-        uint256 amountSol = (_amountResource * 1 ether) / (pricePerSol * (10**resource.decimals()));
+        uint256 amountSol = (_amountResource * 1 ether) / (pricePerSol * factor);
         require(amountSol > 0, "No full Sol");
         uint256 amountLessFees = amountSol - fee;
         accruedFees += fee;
         require(address(this).balance >= amountSol, "Not enough Sol available");
 
-        pricePerSol += (_amountResource / (10**resource.decimals()));
+        pricePerSol += (_amountResource / factor);
         if (pricePerSol > MAX_PRICE_PER_SOL) {
             pricePerSol = MAX_PRICE_PER_SOL;
         }
@@ -78,7 +79,7 @@ contract InfiniteExchange is Ownable {
 
     function withdraw() public onlyOwner {
         require(address(this).balance >= accruedFees, "Not enough ether funds");
-        accruedFees = 0;
         require(payable(msg.sender).send(accruedFees), "Failed to send Ether");
+        delete accruedFees;
     }
 }

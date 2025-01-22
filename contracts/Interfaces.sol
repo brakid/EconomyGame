@@ -13,11 +13,11 @@ interface IToken is IERC20 {
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 interface IHarvester is IERC721 {
-    function mint() external;
+    function mint() external returns (uint256);
     function burn(uint256 _tokenId) external;
     function getResource() external view returns (address);
     function getAvailableResources(uint256 _tokenId) external view returns (uint256);
-    function withdraw(uint256 _tokenId) external;
+    function withdraw(uint256 _tokenId) external returns (uint256);
 }
 
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
@@ -49,5 +49,14 @@ abstract contract Mintable is Ownable {
     function removeMinter(address _minter) public onlyOwner {
         minters[_minter] = false;
         emit MinterChanged(_minter, false);
+    }
+}
+
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+abstract contract ERC721Ownable is ERC721 {
+    modifier onlyTokenOwner(uint256 _tokenId) {
+        require(ownerOf(_tokenId) == msg.sender, "Token owner only");
+        _;
     }
 }
