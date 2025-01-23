@@ -18,8 +18,8 @@ contract Solarcell is ERC721, ERC721Ownable, IHarvester, Mintable {
         addMinter(msg.sender);
     }
 
-    function getResource() external view returns (address) {
-        return address(resource);
+    function getResource() external view returns (IToken) {
+        return resource;
     }
 
     function mint() external onlyMinters() returns (uint256) {

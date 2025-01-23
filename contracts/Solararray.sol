@@ -19,7 +19,7 @@ contract Solararray is IAggregatedHarvester, ERC721, Mintable, ERC721Holder, ERC
         addMinter(msg.sender);
     }
 
-    function getResource() external view returns (address) {
+    function getResource() external view returns (IToken) {
         return harvester.getResource();
     }
 
@@ -55,7 +55,7 @@ contract Solararray is IAggregatedHarvester, ERC721, Mintable, ERC721Holder, ERC
             resources += harvester.withdraw(harvesters[_tokenId][index]);
         }
 
-        require(IToken(harvester.getResource()).transfer(msg.sender, resources), "Transfer failed");
+        require(harvester.getResource().transfer(msg.sender, resources), "Transfer failed");
         return resources;
     }
 }

@@ -50,6 +50,6 @@ contract Crafter is Ownable {
     }
 
     function withdraw() external onlyOwner {
-        require(payable(msg.sender).send(address(this).balance), "Failed to send Ether");
+        require(payable(msg.sender).send(address(this).balance), "Transfer failed");
     }
 }

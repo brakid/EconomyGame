@@ -16,7 +16,7 @@
 Trade the chain native currency against resource materials. The prices will vary based on supply and demand. The exchanges can sell an infinite amount of each raw material (to be discussed whether this should be replaced by limited resource pools to avoid massive resource inflation)
 ## Refinery
 Use energy to refine raw materials
-## Workshop
+## Crafter
 Construct new Harvesters or Aggregators
 ## Getting Started
 Receive EnergyToken for a Proof of Physical Exercise. Caliries burnt -> EnergyToken earned

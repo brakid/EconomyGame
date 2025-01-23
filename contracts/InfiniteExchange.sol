@@ -3,9 +3,9 @@
 pragma solidity >=0.8.2 <0.9.0;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {IToken} from "./Interfaces.sol";
+import {IToken, IExchange} from "./Interfaces.sol";
 
-contract InfiniteExchange is Ownable {
+contract InfiniteExchange is IExchange, Ownable {
     event Trade(address indexed sender, address resource, bool selling, uint256 amountSol, uint256 amountResource);
 
     IToken private immutable resource;
@@ -30,8 +30,8 @@ contract InfiniteExchange is Ownable {
         fee = _fee;
     }
 
-    function getResource() public view returns (address) {
-        return address(resource);
+    function getResource() external view returns (IToken) {
+        return resource;
     }
 
     function buy() external payable {
@@ -77,7 +77,7 @@ contract InfiniteExchange is Ownable {
         emit Trade(msg.sender, address(resource), true, amountLessFees, _amountResource);
     }
 
-    function withdraw() public onlyOwner {
+    function withdraw() external onlyOwner {
         require(address(this).balance >= accruedFees, "Not enough ether funds");
         require(payable(msg.sender).send(accruedFees), "Failed to send Ether");
         delete accruedFees;
