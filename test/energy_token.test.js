@@ -1,10 +1,10 @@
-const EnergyToken = artifacts.require("EnergyToken");
+const Energy = artifacts.require("Energy");
 const { BN, expectRevert } = require('@openzeppelin/test-helpers');
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-contract("EnergyToken", function (accounts) {
+contract("Energy", function (accounts) {
   it("should assert true", async function () {
-    const token = await EnergyToken.deployed();
+    const token = await Energy.deployed();
 
     const tokenOwner = accounts[0];
     const tokenMinter = accounts[1];

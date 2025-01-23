@@ -28,6 +28,7 @@ module.exports = async function(deployer) {
     // Trading
     await deployer.deploy(InfiniteExchange, Energy.address);
     const energyExchange = await InfiniteExchange.deployed();
+/*
     await deployer.deploy(InfiniteExchange, Sand.address);
     const sandExchange = await InfiniteExchange.deployed();
     await deployer.deploy(InfiniteExchange, IronOre.address);
@@ -35,6 +36,7 @@ module.exports = async function(deployer) {
     await deployer.deploy(InfiniteExchange, Oil.address);
     const oilExchange = await InfiniteExchange.deployed();
     await deployer.deploy(ExchangeRouter);
+*/
 
     // Harvesters
     await deployer.deploy(Solarcell, Energy.address);
@@ -43,7 +45,7 @@ module.exports = async function(deployer) {
     // Utilities
     await deployer.deploy(ProofOfExercise, Energy.address);
     await deployer.deploy(Crafter);
-
+/*
     const energy = await Energy.deployed();
     const sand = await Sand.deployed();
     const ironOre = await IronOre.deployed();
@@ -100,4 +102,5 @@ module.exports = async function(deployer) {
     await sand.addMinter(sandExchange.address);
     await ironOre.addMinter(ironOreExchange.address);
     await oil.addMinter(oilExchange.address);
+*/
 }
