@@ -9,8 +9,8 @@ function toWei(n, unit) {
 
 contract("InfiniteExchange", function (accounts) {
     it("should assert true", async function () {
-        const energy = await Energy.deployed();
-        const infiniteExchange = await InfiniteExchange.deployed();
+        const energy = await Energy.new();
+        const infiniteExchange = await InfiniteExchange.new(energy.address);
         const resource = await infiniteExchange.getResource();
         assert.equal(energy.address, resource);
 

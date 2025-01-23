@@ -5,8 +5,8 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 contract("ProofOfExercise", function (accounts) {
   it("should assert true", async function () {
-    const token = await Energy.deployed();
-    const proofOfExercise = await ProofOfExercise.deployed();
+    const token = await Energy.new();
+    const proofOfExercise = await ProofOfExercise.new(token.address);
 
     await token.addMinter(proofOfExercise.address);
 

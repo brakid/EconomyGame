@@ -11,15 +11,15 @@ function toWei(n, unit) {
 
 contract("Crafter", function (accounts) {
   it("should assert true", async function () {
-    const energy = await Energy.deployed();
-    const solarcell = await Solarcell.deployed();
-    const solararray = await Solararray.deployed();
-    const crafter = await Crafter.deployed();
+    const energy = await Energy.new();
+    const solarcell = await Solarcell.new(energy.address);
+    const solararray = await Solararray.new(solarcell.address);
+    const crafter = await Crafter.new();
 
     const tokenOwner = accounts[0];
     const customer = accounts[1];
 
-    await energy.addMinter(accounts[0]);
+    await energy.addMinter(tokenOwner);
     await energy.addMinter(crafter.address);
 
     await solarcell.addMinter(crafter.address);

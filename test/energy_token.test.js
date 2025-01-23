@@ -4,7 +4,7 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 contract("Energy", function (accounts) {
   it("should assert true", async function () {
-    const token = await Energy.deployed();
+    const token = await Energy.new();
 
     const tokenOwner = accounts[0];
     const tokenMinter = accounts[1];

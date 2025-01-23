@@ -5,9 +5,9 @@ const { BN, expectRevert, expectEvent, time } = require('@openzeppelin/test-help
 
 contract("Solararray", function (accounts) {
   it("should assert true", async function () {
-    const energy = await Energy.deployed();
-    const solarcell = await Solarcell.deployed();
-    const solararray = await Solararray.deployed();
+    const energy = await Energy.new();
+    const solarcell = await Solarcell.new(energy.address);
+    const solararray = await Solararray.new(solarcell.address);
 
     await energy.addMinter(solarcell.address);
 

@@ -6,6 +6,8 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IToken, IExchange} from "./Interfaces.sol";
 
 contract ExchangeRouter is Ownable {
+    event ExchangeRegistered(address indexed exchange, address indexed resource);
+
     mapping(address => address) private registeredExchanges;
 
     constructor() Ownable(msg.sender) {}
@@ -16,6 +18,7 @@ contract ExchangeRouter is Ownable {
         address resource = address(exchange.getResource());
         require(registeredExchanges[resource] == address(0), "Exchange for resource already registered");
         registeredExchanges[resource] = _exchange;
+        emit ExchangeRegistered(_exchange, resource);
     }
 
     function getExchange(address _resource) external view returns (IExchange) {
