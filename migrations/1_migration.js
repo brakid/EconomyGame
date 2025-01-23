@@ -38,13 +38,10 @@ module.exports = async function(deployer, network) {
     await deployer.deploy(ProofOfExercise, Energy.address);
     await deployer.deploy(Crafter);
 
-    if (network === 'brakidchain') {
-        await deployer.deploy(InfiniteExchange, Sand.address);
-        const sandExchange = await InfiniteExchange.deployed();
-        await deployer.deploy(InfiniteExchange, IronOre.address);
-        const ironOreExchange = await InfiniteExchange.deployed();
-        await deployer.deploy(InfiniteExchange, Oil.address);
-        const oilExchange = await InfiniteExchange.deployed();
+    if ((network === 'localnet') || (network === 'brakidchain')) {
+        const sandExchange = await InfiniteExchange.new(Sand.address);
+        const ironOreExchange = await InfiniteExchange.new(IronOre.address);
+        const oilExchange = await InfiniteExchange.new(Oil.address);
 
         const energy = await Energy.deployed();
         const sand = await Sand.deployed();
@@ -75,11 +72,11 @@ module.exports = async function(deployer, network) {
         const proofOfExercise = await ProofOfExercise.deployed();
 
         const crafter = await Crafter.deployed();
-        await crafter.addRecipe(solarcell.address, [{ ingredient: silicium.address, amount: 10 }, { ingredient: energy.address, amount: 1000 }]);
-        await crafter.addRecipe(solararray.address, [{ ingredient: iron.address, amount: 20 }, { ingredient: energy.address, amount: 10000 }]);
-        await crafter.addRecipe(silicium.address, [{ ingredient: sand.address, amount: 5 }, { ingredient: energy.address, amount: 1000 }]);
-        await crafter.addRecipe(iron.address, [{ ingredient: ironOre.address, amount: 10 }, { ingredient: energy.address, amount: 5000 }]);
-        await crafter.addRecipe(carbon.address, [{ ingredient: oil.address, amount: 5 }, { ingredient: energy.address, amount: 10000 }]);
+        await crafter.addCraftingRecipe(solarcell.address, [{ ingredient: silicium.address, amount: 10 }, { ingredient: energy.address, amount: 1000 }]);
+        await crafter.addCraftingRecipe(solararray.address, [{ ingredient: iron.address, amount: 20 }, { ingredient: energy.address, amount: 10000 }]);
+        await crafter.addRefinementRecipe(silicium.address, [{ ingredient: sand.address, amount: 5 }, { ingredient: energy.address, amount: 1000 }]);
+        await crafter.addRefinementRecipe(iron.address, [{ ingredient: ironOre.address, amount: 10 }, { ingredient: energy.address, amount: 5000 }]);
+        await crafter.addRefinementRecipe(carbon.address, [{ ingredient: oil.address, amount: 5 }, { ingredient: energy.address, amount: 10000 }]);
 
         await energy.addMinter(solarcell.address);
         await energy.addMinter(proofOfExercise.address);
