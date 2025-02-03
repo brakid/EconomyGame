@@ -1,4 +1,7 @@
 node_modules
 .env
-build
+artifacts
+cache
 .DS_Store
+ignition/deployments
+typechain-types

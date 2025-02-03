@@ -88,3 +88,9 @@ interface IExchange {
     function buy() external payable;
     function sell(uint256 _amountResource) external;
 }
+
+interface IMine {
+    function getResource() external view returns (IToken);
+    function mine() external;
+    function retrieve() external;
+}
