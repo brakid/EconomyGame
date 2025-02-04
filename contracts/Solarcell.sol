@@ -34,11 +34,11 @@ contract Solarcell is ERC721, ERC721Ownable, IHarvester, Mintable {
 
     function getAvailableResources(uint256 _tokenId) external view returns (uint256) {
         ownerOf(_tokenId); // check tokenId exists
-        return (block.timestamp - lastTimestamp[_tokenId]) * factor / 3600; // one token per hour
+        return ((block.timestamp - lastTimestamp[_tokenId]) * factor) / 1 hours; // one token per hour
     }
 
     function withdraw(uint256 _tokenId) external onlyTokenOwner(_tokenId) returns (uint256) {
-        uint256 available = (block.timestamp - lastTimestamp[_tokenId]) * factor / 3600; // one token per hour
+        uint256 available = ((block.timestamp - lastTimestamp[_tokenId]) * factor) / 1 hours; // one token per hour
         resource.mint(available);
         lastTimestamp[_tokenId] = block.timestamp;
         require(resource.transfer(msg.sender, available), "Transfer failed");

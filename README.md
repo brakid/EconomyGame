@@ -78,6 +78,13 @@ await energy.approve(sandMine, ethers.parseEther("1000"))
 
 await sandMine.mine()
 await sandMine.retrieve()
+
+const ironOreMine = await ethers.getContractAt('Mine', '0x5adcdfDc48bf515CA6F6409657557BAC9b727528')
+await ironOreMine.getResource()
+
+await energy.approve(ironOreMine, ethers.parseEther("1000"))
+await ironOreMine.mine()
+await ironOreMine.retrieve()
 ```
 
 # Next Steps:
