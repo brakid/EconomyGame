@@ -28,6 +28,7 @@ const App = () => {
   const [energyBalance, setEnergyBalance] = useState<string>('');
   const [sandBalance, setSandBalance] = useState<string>('');
   const [solarcells, setSolarcells] = useState<[number, string][]>([]);
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     const init = async () => {
@@ -45,7 +46,7 @@ const App = () => {
         const sandMineContract = new ethers.Contract('0xe63147988932774E186cE435906dBdFc23894F3D', IMine.abi, signerProvider);
         setContracts({ energyContract, sandContract, solarcellContract, sandMineContract });
       } catch (error) {
-        console.log(error);
+        setError(JSON.stringify(error));
       }
     }
     init();
@@ -65,15 +66,17 @@ const App = () => {
         const solarcells = zip(ownedSolarcellIds, await Promise.all(ownedSolarcellIds.map(id => contracts.solarcellContract.getAvailableResources(id) as Promise<bigint>))).map(record => [record[0], ethers.formatUnits(record[1].toString(), energyDecimals)]) as [number, string][];
         setSolarcells(solarcells);
       } catch (error) {
-        console.log(error);
+        setError(JSON.stringify(error));
       }
     }
+    setError(undefined);
     fetch();
   }, [blockNumber]);
   
   return (
     <>
       <h1>EconomyGame DApp</h1>
+      { !!error && (<code>{ error }</code>) }
       <p>Block Number: { blockNumber }</p>
       <p>Address: { signerAddress }</p>
       <p>Energy Balance: { energyBalance }</p>
@@ -84,7 +87,7 @@ const App = () => {
           try {
             await contracts?.solarcellContract.withdraw(solarcell[0]);
           } catch (error) {
-            console.log(`Error: ${JSON.stringify(error)}`);
+            setError(JSON.stringify(error));
           }
         } }>Retrieve Solarcell { solarcell[0] }</button>)) }
       </div>
@@ -97,14 +100,14 @@ const App = () => {
             }
             await contracts?.sandMineContract.mine();
           } catch (error) {
-            console.log(`Error: ${JSON.stringify(error)}`);
+            setError(JSON.stringify(error));
           }
         } }>Mine</button>
         <button onClick={ async () => {
           try {
             await contracts?.sandMineContract.retrieve();
           } catch (error) {
-            console.log(`Error: ${JSON.stringify(error)}`);
+            setError(JSON.stringify(error));
           }
         } }>Withdraw</button>
       </div>
