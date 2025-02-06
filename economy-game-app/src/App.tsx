@@ -87,9 +87,41 @@ const App = () => {
       <p>Block Number: { blockNumber }</p>
       <p>Address: { signerAddress }</p>
       <p>Energy Balance: { energyBalance }</p>
-      <p>Sand Balance: { sandBalance }</p>
+      <p>Sand Balance: { sandBalance }
+        <button disabled={ !(energyBalance >= 10 && siliciumBalance >= 10) } onClick={ async () => {
+          try {
+            let remainingApproval = await contracts?.energyContract.allowance(signerAddress, contracts.crafterContract);
+            if (remainingApproval < 1000n) {
+              await contracts?.energyContract.approve(contracts.crafterContract, ethers.parseEther('1000'));
+            }
+            remainingApproval = await contracts?.sandContract.allowance(signerAddress, contracts.crafterContract);
+            if (remainingApproval < 1000n) {
+              await contracts?.sandContract.approve(contracts.crafterContract, ethers.parseEther('1000'));
+            }
+            await contracts?.crafterContract.refine(contracts.siliciumContract, { value: ethers.parseUnits('1', 'gwei') });
+          } catch (error) {
+            setError(JSON.stringify(error));
+          }
+        } }>Refine Sand to Silicium</button>
+      </p>
       <p>Silicium Balance: { siliciumBalance }</p>
-      <p>Solarcells: { JSON.stringify(solarcells) }</p>
+      <p>Solarcells: { JSON.stringify(solarcells) }
+        <button disabled={ !(energyBalance >= 10 && siliciumBalance >= 5) } onClick={ async () => {
+          try {
+            let remainingApproval = await contracts?.energyContract.allowance(signerAddress, contracts.crafterContract);
+            if (remainingApproval < 1000n) {
+              await contracts?.energyContract.approve(contracts.crafterContract, ethers.parseEther('1000'));
+            }
+            remainingApproval = await contracts?.siliciumContract.allowance(signerAddress, contracts.crafterContract);
+            if (remainingApproval < 1000n) {
+              await contracts?.siliciumContract.approve(contracts.crafterContract, ethers.parseEther('1000'));
+            }
+            await contracts?.crafterContract.craft(contracts.solarcellContract, { value: ethers.parseUnits('1', 'gwei') });
+          } catch (error) {
+            setError(JSON.stringify(error));
+          }
+        } }>Craft new Solarcell</button>
+      </p>
       <div>
         { solarcells.map((solarcell, index) => (<button key={ index } onClick={ async () => { 
           try {
@@ -120,38 +152,10 @@ const App = () => {
         } }>Withdraw</button>
       </div>
       <div>
-        <button onClick={ async () => {
-          try {
-            let remainingApproval = await contracts?.energyContract.allowance(signerAddress, contracts.crafterContract);
-            if (remainingApproval < 1000n) {
-              await contracts?.energyContract.approve(contracts.crafterContract, ethers.parseEther('1000'));
-            }
-            remainingApproval = await contracts?.sandContract.allowance(signerAddress, contracts.crafterContract);
-            if (remainingApproval < 1000n) {
-              await contracts?.sandContract.approve(contracts.crafterContract, ethers.parseEther('1000'));
-            }
-            await contracts?.crafterContract.refine(contracts.siliciumContract, { value: ethers.parseUnits('1', 'gwei') });
-          } catch (error) {
-            setError(JSON.stringify(error));
-          }
-        } }>Refine Sand to Silicium</button>
+        
       </div>
       <div>
-        <button disabled={ !(energyBalance >= 10 && siliciumBalance >= 5) } onClick={ async () => {
-          try {
-            let remainingApproval = await contracts?.energyContract.allowance(signerAddress, contracts.crafterContract);
-            if (remainingApproval < 1000n) {
-              await contracts?.energyContract.approve(contracts.crafterContract, ethers.parseEther('1000'));
-            }
-            remainingApproval = await contracts?.siliciumContract.allowance(signerAddress, contracts.crafterContract);
-            if (remainingApproval < 1000n) {
-              await contracts?.siliciumContract.approve(contracts.crafterContract, ethers.parseEther('1000'));
-            }
-            await contracts?.crafterContract.craft(contracts.solarcellContract, { value: ethers.parseUnits('1', 'gwei') });
-          } catch (error) {
-            setError(JSON.stringify(error));
-          }
-        } }>Craft new Solarcell</button>
+        
       </div>
     </>  
   )
