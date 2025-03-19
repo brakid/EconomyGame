@@ -5,6 +5,7 @@ import * as Solarcell from '../../artifacts/contracts/Solarcell.sol/Solarcell.js
 import * as IMine from '../../artifacts/contracts/Interfaces.sol/IMine.json';
 import * as Crafter from '../../artifacts/contracts/Crafter.sol/Crafter.json';
 import * as ProofOfExercise from '../../artifacts/contracts/ProofOfExercise.sol/ProofOfExercise.json';
+import * as InfiniteExchange from '../../artifacts/contracts/InfiniteExchange.sol/InfiniteExchange.json';
 import './App.css';
 
 interface Contracts {
@@ -15,6 +16,8 @@ interface Contracts {
   sandMineContract: ethers.Contract,
   crafterContract: ethers.Contract,
   proofOfExerciseContract: ethers.Contract,
+  sandExchangeContract: ethers.Contract,
+  energyExchangeContract: ethers.Contract,
 }
 
 const zip = <S, T>(a: S[], b: T[]): [S, T][] => a.map((k, i) => [k, b[i]]);
@@ -45,6 +48,8 @@ const App = () => {
   const [error, setError] = useState<any>();
   const [receiver, setReceiver] = useState<string>('');
   const [calories, setCalories] = useState<number>(0);
+  const [sandPrice, setSandPrice] = useState<number>(0);
+  const [energyPrice, setEnergyPrice] = useState<number>(0);
 
   useEffect(() => {
     const init = async () => {
@@ -63,7 +68,9 @@ const App = () => {
         const sandMineContract = new ethers.Contract('0xe63147988932774E186cE435906dBdFc23894F3D', IMine.abi, signerProvider);
         const crafterContract = new ethers.Contract('0x2c63c3bC265de5e3FB8203a01C0ADcBAc79f3B99', Crafter.abi, signerProvider);
         const proofOfExerciseContract = new ethers.Contract('0xcD6EA99A687e95604aE9E7c6F99618b84649fac3', ProofOfExercise.abi, signerProvider);
-        setContracts({ energyContract, sandContract, siliciumContract, solarcellContract, sandMineContract, crafterContract, proofOfExerciseContract });
+        const sandExchangeContract = new ethers.Contract('0x7a3752BA5A7D2e97542E37094C0463794373Ec8E', InfiniteExchange.abi, signerProvider);
+        const energyExchangeContract = new ethers.Contract('0x2Fa791e145EEC8B49b54f8D9505ceEeBAAF467D2', InfiniteExchange.abi, signerProvider);
+        setContracts({ energyContract, sandContract, siliciumContract, solarcellContract, sandMineContract, crafterContract, proofOfExerciseContract, sandExchangeContract, energyExchangeContract });
       } catch (error: any) {
         setError(error);
       }
@@ -81,6 +88,8 @@ const App = () => {
         setEnergyBalance(parseFloat(ethers.formatUnits((await contracts.energyContract.balanceOf(signerAddress)).toString(), energyDecimals)));
         setSandBalance(parseFloat(ethers.formatUnits((await contracts.sandContract.balanceOf(signerAddress)).toString(), await contracts.sandContract.decimals())));
         setSiliciumBalance(parseFloat(ethers.formatUnits((await contracts.siliciumContract.balanceOf(signerAddress)).toString(), await contracts.siliciumContract.decimals())));
+        setSandPrice(parseFloat((await contracts.sandExchangeContract.pricePerSol()).toString()));
+        setEnergyPrice(parseFloat((await contracts.energyExchangeContract.pricePerSol()).toString()));
         const solarcellIds = range(await contracts.solarcellContract.nextTokenId() as bigint);
         const ownedSolarcellIds = zip(solarcellIds, await Promise.all(solarcellIds.map(id => contracts.solarcellContract.ownerOf(id) as Promise<string>))).filter(record => record[1] === signerAddress).map(record => record[0]);
         const solarcells = zip(ownedSolarcellIds, await Promise.all(ownedSolarcellIds.map(id => contracts.solarcellContract.getAvailableResources(id) as Promise<bigint>))).map(record => [record[0], ethers.formatUnits(record[1].toString(), energyDecimals)]) as [number, string][];
@@ -173,6 +182,50 @@ const App = () => {
               setError(error);
             }
           } }>Withdraw</button>
+        </article>
+        <article>
+          <h3>Exchange Sol &lt;-&gt; Sand</h3>
+          <p>1 Sol = { sandPrice } Sand</p>
+          <button className='solarcell' onClick={ async () => { 
+            try {
+              await contracts?.sandExchangeContract.buy({ value: ethers.parseUnits('1000000001', 'gwei') });
+            } catch (error: any) {
+              setError(error);
+            }
+          } }>Buy { sandPrice } Sand for 1 Sol</button>
+          <button className='solarcell' onClick={ async () => { 
+            try {
+              const remainingApproval = await contracts?.sandContract.allowance(signerAddress, contracts.sandExchangeContract);
+              if (remainingApproval < 1000n) {
+                await contracts?.sandContract.approve(contracts.sandExchangeContract, ethers.parseEther('1000'));
+              }
+              await contracts?.sandExchangeContract.sell(BigInt(sandPrice));
+            } catch (error: any) {
+              setError(error);
+            }
+          } }>Sell { sandPrice } Sand for 1 Sol</button>
+        </article>
+        <article>
+          <h3>Exchange Sol &lt;-&gt; Energy</h3>
+          <p>1 Sol = { energyPrice } Energy</p>
+          <button className='solarcell' onClick={ async () => { 
+            try {
+              await contracts?.energyExchangeContract.buy({ value: ethers.parseUnits('1000000001', 'gwei') });
+            } catch (error: any) {
+              setError(error);
+            }
+          } }>Buy { energyPrice } Energy for 1 Sol</button>
+          <button className='solarcell' onClick={ async () => { 
+            try {
+              const remainingApproval = await contracts?.energyContract.allowance(signerAddress, contracts.energyExchangeContract);
+              if (remainingApproval < 1000n) {
+                await contracts?.energyContract.approve(contracts.energyExchangeContract, ethers.parseEther('1000'));
+              }
+              await contracts?.energyExchangeContract.sell(BigInt(energyPrice * 100));
+            } catch (error: any) {
+              setError(error);
+            }
+          } }>Sell { energyPrice } Energy for 1 Sol</button>
         </article>
         <article>
           <h3>Proof Of Exercise</h3>
